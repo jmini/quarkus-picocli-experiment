@@ -42,10 +42,13 @@ tasks.withType(GenerateModuleMetadata).configureEach {
     suppressedValidationErrors.add('enforced-platform')
 }
 
+def quarkusBuildTask = tasks.named("quarkusBuild", io.quarkus.gradle.tasks.QuarkusBuild.class)
+def runnerJar = quarkusBuildTask.get().outputs.files.filter(f -> f.getName().endsWith("-runner.jar")).getSingleFile();
 publishing {
     publications {
         mavenJava(MavenPublication) {
             from components.java
+            artifact source: runnerJar, classifier: 'runner', extension: 'jar', builtBy: quarkusBuildTask
         }
     }
 }
