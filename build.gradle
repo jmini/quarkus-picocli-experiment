@@ -1,6 +1,7 @@
 plugins {
     id 'java'
     id 'io.quarkus'
+    id 'org.kordamp.gradle.jandex' version '1.1.0'
 }
 
 repositories {
@@ -13,6 +14,17 @@ dependencies {
     implementation 'io.quarkus:quarkus-picocli'
     implementation 'io.quarkus:quarkus-arc'
     testImplementation 'io.quarkus:quarkus-junit5'
+}
+
+tasks.named("quarkusDependenciesBuild") {
+    inputs.files(tasks.getByPath("jandex").outputs.files)
+}
+
+//Workaround for https://github.com/kordamp/jandex-gradle-plugin/issues/24:
+tasks.named('jandex') {
+    inputs.files(sourceSets.findByName('main').output.classesDirs*.absolutePath.flatten())
+        .withPropertyName('mainSourceSet')
+        .withPathSensitivity(PathSensitivity.RELATIVE)
 }
 
 group 'org.acme'
